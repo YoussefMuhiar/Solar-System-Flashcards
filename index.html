@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Solar System Flashcards</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #1e3a8a, #3b82f6);
+            overflow: hidden;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+        }
+
+        .scrollable-container {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+
+        .scrollable-container::-webkit-scrollbar {
+            display: none;
+        }
+
+        .flashcard-wrapper {
+            perspective: 1000px;
+        }
+
+        .flashcard-card {
+            border: 4px solid;
+            cursor: pointer;
+            transition: transform 0.6s;
+            transform-style: preserve-3d;
+            position: relative;
+            background-color: white;
+        }
+
+        .flashcard-card.flipped {
+            transform: rotateY(180deg);
+        }
+
+        .flashcard-front, .flashcard-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            -webkit-backface-visibility: hidden;
+            backface-visibility: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            padding: 1.5rem;
+            border-radius: 1rem;
+        }
+
+        .flashcard-front {
+            z-index: 2;
+        }
+
+        .flashcard-back {
+            transform: rotateY(180deg);
+        }
+
+        .flashcard-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+        }
+
+        .solar-theme-text {
+            color: #fcd34d;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+        }
+        
+        .solar-theme-title {
+            color: #f9a8d4;
+        }
+
+        .solar-theme-subtitle {
+            color: #d8b4fe;
+        }
+        
+        #flashcard-wrapper {
+            overflow-x: auto;
+            scrollbar-width: thin;
+            scrollbar-color: #fcd34d #60a5fa;
+        }
+        
+        #flashcard-wrapper::-webkit-scrollbar {
+            height: 8px;
+        }
+        
+        #flashcard-wrapper::-webkit-scrollbar-thumb {
+            background-color: #fcd34d;
+            border-radius: 10px;
+        }
+        
+        #flashcard-wrapper::-webkit-scrollbar-track {
+            background-color: #d1d5db;
+        }
+
+        .expanded-card {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(1);
+            width: 90%;
+            max-width: 800px;
+            height: auto;
+            max-height: 90vh;
+            background-color: white;
+            padding: 2rem;
+            border-radius: 1rem;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+            z-index: 100;
+            transition: transform 0.6s ease, opacity 0.3s ease;
+            transform-style: preserve-3d;
+        }
+
+        .expanded-card.flipped {
+            transform: translate(-50%, -50%) scale(1) rotateY(180deg);
+        }
+
+        #overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            z-index: 99;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+        }
+
+        #overlay.visible {
+            opacity: 1;
+            visibility: visible;
+        }
+    </style>
+</head>
+<body class="flex items-center justify-center min-h-screen p-4 overflow-hidden">
+    <div class="w-full max-w-7xl mx-auto text-center" id="main-container">
+
+        <div id="flashcard-grid-view">
+            <h1 class="text-4xl sm:text-5xl font-extrabold solar-theme-text mb-2">
+                Our Solar System 🪐
+            </h1>
+            <p class="text-lg text-white mb-12 max-w-2xl mx-auto">Explore the planets and learn fun facts! Click a card to flip it and find out more.</p>
+
+            <div id="flashcard-wrapper" class="relative overflow-x-hidden w-full h-auto py-10">
+                <div id="flashcard-content" class="flex flex-nowrap items-center h-full transition-transform duration-300 ease-in-out">
+                    
+                    <div class="flex-shrink-0 w-[320px] h-[400px] mx-8 rounded-xl shadow-lg border-yellow-300 flashcard-wrapper" data-card="mercury">
+                        <div class="flashcard-card">
+                            <div class="flashcard-front">
+                                <h2 class="text-xl font-bold solar-theme-title mb-2">Mercury ☀️</h2>
+                                <h3 class="text-2xl font-semibold text-gray-800 mb-4">The Smallest Planet</h3>
+                                <p class="text-gray-600 text-center">It's the closest planet to the Sun.</p>
+                            </div>
+                            <div class="flashcard-back">
+                                <p class="text-gray-600 text-center text-lg">Even though it's closest to the Sun, Mercury isn't the hottest planet. It's also covered in craters, similar to our Moon!</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="flex-shrink-0 w-[320px] h-[400px] mx-8 rounded-xl shadow-lg border-red-400 flashcard-wrapper" data-card="venus">
+                        <div class="flashcard-card">
+                            <div class="flashcard-front">
+                                <h2 class="text-xl font-bold solar-theme-title mb-2">Venus 🔥</h2>
+                                <h3 class="text-2xl font-semibold text-gray-800 mb-4">The Hottest Planet</h3>
+                                <p class="text-gray-600 text-center">It's also known as Earth's "sister planet."</p>
+                            </div>
+                            <div class="flashcard-back">
+                                <p class="text-gray-600 text-center text-lg">Venus has a thick atmosphere of greenhouse gases that trap heat, making it the hottest planet in our solar system, even hotter than Mercury!</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="flex-shrink-0 w-[320px] h-[400px] mx-8 rounded-xl shadow-lg border-blue-500 flashcard-wrapper" data-card="earth">
+                        <div class="flashcard-card">
+                            <div class="flashcard-front">
+                                <h2 class="text-xl font-bold solar-theme-title mb-2">Earth 🌎</h2>
+                                <h3 class="text-2xl font-semibold text-gray-800 mb-4">Our Home Planet</h3>
+                                <p class="text-gray-600 text-center">The only place we know of with living things!</p>
+                            </div>
+                            <div class="flashcard-back">
+                                <p class="text-gray-600 text-center text-lg">Earth is the fifth-largest planet and the only one with liquid water on its surface. It's home to millions of different kinds of plants and animals.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="flex-shrink-0 w-[320px] h-[400px] mx-8 rounded-xl shadow-lg border-orange-500 flashcard-wrapper" data-card="mars">
+                        <div class="flashcard-card">
+                            <div class="flashcard-front">
+                                <h2 class="text-xl font-bold solar-theme-title mb-2">Mars 🔴</h2>
+                                <h3 class="text-2xl font-semibold text-gray-800 mb-4">The Red Planet</h3>
+                                <p class="text-gray-600 text-center">Its red color comes from rusty iron in the soil.</p>
+                            </div>
+                            <div class="flashcard-back">
+                                <p class="text-gray-600 text-center text-lg">Mars has two small moons, Phobos and Deimos. Scientists are always exploring Mars with robots to see if there could be life there one day!</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="flex-shrink-0 w-[320px] h-[400px] mx-8 rounded-xl shadow-lg border-yellow-500 flashcard-wrapper" data-card="jupiter">
+                        <div class="flashcard-card">
+                            <div class="flashcard-front">
+                                <h2 class="text-xl font-bold solar-theme-title mb-2">Jupiter 💨</h2>
+                                <h3 class="text-2xl font-semibold text-gray-800 mb-4">The Giant Planet</h3>
+                                <p class="text-gray-600 text-center">It's the biggest planet and has a giant storm!</p>
+                            </div>
+                            <div class="flashcard-back">
+                                <p class="text-gray-600 text-center text-lg">Jupiter is so big that all the other planets could fit inside it! The giant red spot on Jupiter is actually a storm that has been raging for hundreds of years.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="flex-shrink-0 w-[320px] h-[400px] mx-8 rounded-xl shadow-lg border-purple-400 flashcard-wrapper" data-card="saturn">
+                        <div class="flashcard-card">
+                            <div class="flashcard-front">
+                                <h2 class="text-xl font-bold solar-theme-title mb-2">Saturn 💍</h2>
+                                <h3 class="text-2xl font-semibold text-gray-800 mb-4">The Ringed Planet</h3>
+                                <p class="text-gray-600 text-center">Its rings are made of ice and rock.</p>
+                            </div>
+                            <div class="flashcard-back">
+                                <p class="text-gray-600 text-center text-lg">Saturn's rings are incredibly thin, even though they are very wide. It's the second-largest planet and has dozens of moons!</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="flex-shrink-0 w-[320px] h-[400px] mx-8 rounded-xl shadow-lg border-cyan-400 flashcard-wrapper" data-card="uranus">
+                        <div class="flashcard-card">
+                            <div class="flashcard-front">
+                                <h2 class="text-xl font-bold solar-theme-title mb-2">Uranus 🌬️</h2>
+                                <h3 class="text-2xl font-semibold text-gray-800 mb-4">The "Sideways" Planet</h3>
+                                <p class="text-gray-600 text-center">It spins on its side!</p>
+                            </div>
+                            <div class="flashcard-back">
+                                <p class="text-gray-600 text-center text-lg">Uranus is an ice giant. It's unique because it rotates on its side, almost at a 90-degree angle to its orbit, which makes it look like it's rolling around the Sun.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="flex-shrink-0 w-[320px] h-[400px] mx-8 rounded-xl shadow-lg border-indigo-500 flashcard-wrapper" data-card="neptune">
+                        <div class="flashcard-card">
+                            <div class="flashcard-front">
+                                <h2 class="text-xl font-bold solar-theme-title mb-2">Neptune 🥶</h2>
+                                <h3 class="text-2xl font-semibold text-gray-800 mb-4">The Windiest Planet</h3>
+                                <p class="text-gray-600 text-center">It's the farthest planet from the Sun.</p>
+                            </div>
+                            <div class="flashcard-back">
+                                <p class="text-gray-600 text-center text-lg">Neptune has the fastest winds in the solar system, with speeds up to 1,200 miles per hour! It's a very cold and dark planet.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="overlay"></div>
+        <div id="expanded-card-view" class="hidden expanded-card">
+            <div id="expanded-card-content" class="flashcard-card">
+                <div class="flashcard-front">
+                    <h2 class="text-3xl font-bold solar-theme-title mb-4" id="expanded-card-title-front"></h2>
+                    <p class="text-gray-600 text-xl text-center" id="expanded-card-subtitle-front"></p>
+                </div>
+                <div class="flashcard-back">
+                    <h2 class="text-3xl font-bold solar-theme-title mb-4" id="expanded-card-title-back"></h2>
+                    <p class="text-gray-600 text-xl text-center" id="expanded-card-description-back"></p>
+                </div>
+            </div>
+            <button id="close-button" class="absolute top-4 right-4 bg-white rounded-full p-2 text-gray-600 hover:text-gray-800 hover:bg-gray-200 focus:outline-none">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+            </button>
+        </div>
+
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const flashcardContent = document.getElementById('flashcard-content');
+            const flashcardWrapper = document.getElementById('flashcard-wrapper');
+            const flashcardGridView = document.getElementById('flashcard-grid-view');
+            const expandedCardView = document.getElementById('expanded-card-view');
+            const expandedCardContent = document.getElementById('expanded-card-content');
+            const overlay = document.getElementById('overlay');
+            const closeButton = document.getElementById('close-button');
+            const expandedTitleFront = document.getElementById('expanded-card-title-front');
+            const expandedSubtitleFront = document.getElementById('expanded-card-subtitle-front');
+            const expandedTitleBack = document.getElementById('expanded-card-title-back');
+            const expandedDescriptionBack = document.getElementById('expanded-card-description-back');
+
+            let scrollPosition = 0;
+            const scrollSpeed = 0.5;
+
+            // Define the detailed content for each card
+            const cardDetails = {
+                'mercury': {
+                    title: 'Mercury ☀️',
+                    subtitle: 'The Smallest Planet',
+                    description: "Even though it's closest to the Sun, Mercury isn't the hottest planet. It's also covered in craters, similar to our Moon!"
+                },
+                'venus': {
+                    title: 'Venus 🔥',
+                    subtitle: 'The Hottest Planet',
+                    description: "Venus has a thick atmosphere of greenhouse gases that trap heat, making it the hottest planet in our solar system, even hotter than Mercury!"
+                },
+                'earth': {
+                    title: 'Earth 🌎',
+                    subtitle: 'Our Home Planet',
+                    description: "Earth is the fifth-largest planet and the only one with liquid water on its surface. It's home to millions of different kinds of plants and animals."
+                },
+                'mars': {
+                    title: 'Mars 🔴',
+                    subtitle: 'The Red Planet',
+                    description: "Mars has two small moons, Phobos and Deimos. Scientists are always exploring Mars with robots to see if there could be life there one day!"
+                },
+                'jupiter': {
+                    title: 'Jupiter 💨',
+                    subtitle: 'The Giant Planet',
+                    description: "Jupiter is so big that all the other planets could fit inside it! The giant red spot on Jupiter is actually a storm that has been raging for hundreds of years."
+                },
+                'saturn': {
+                    title: 'Saturn 💍',
+                    subtitle: 'The Ringed Planet',
+                    description: "Saturn's rings are incredibly thin, even though they are very wide. It's the second-largest planet and has dozens of moons!"
+                },
+                'uranus': {
+                    title: 'Uranus 🌬️',
+                    subtitle: 'The "Sideways" Planet',
+                    description: "Uranus is an ice giant. It's unique because it rotates on its side, almost at a 90-degree angle to its orbit, which makes it look like it's rolling around the Sun."
+                },
+                'neptune': {
+                    title: 'Neptune 🥶',
+                    subtitle: 'The Windiest Planet',
+                    description: "Neptune has the fastest winds in the solar system, with speeds up to 1,200 miles per hour! It's a very cold and dark planet."
+                }
+            };
+
+            // Horizontal scroll logic
+            function updateMaxScroll() {
+                const maxScroll = flashcardContent.scrollWidth - flashcardWrapper.clientWidth;
+                return maxScroll;
+            }
+
+            function handleScroll(e) {
+                e.preventDefault(); 
+                const maxScroll = updateMaxScroll();
+                scrollPosition += e.deltaY * scrollSpeed;
+                scrollPosition = Math.max(0, Math.min(scrollPosition, maxScroll));
+                flashcardContent.style.transform = `translateX(-${scrollPosition}px)`;
+            }
+
+            window.addEventListener('wheel', handleScroll);
+            window.addEventListener('resize', () => {
+                updateMaxScroll();
+                scrollPosition = Math.max(0, Math.min(scrollPosition, updateMaxScroll()));
+                flashcardContent.style.transform = `translateX(-${scrollPosition}px)`;
+            });
+
+            // Click event logic
+            document.querySelectorAll('.flashcard-wrapper').forEach(cardWrapper => {
+                const card = cardWrapper.querySelector('.flashcard-card');
+
+                // Toggle flip on the small card
+                cardWrapper.addEventListener('click', () => {
+                    card.classList.toggle('flipped');
+                });
+
+                // Show the expanded view on click (and re-flip if needed)
+                cardWrapper.addEventListener('click', (e) => {
+                    e.stopPropagation(); // Prevent the body click from firing immediately
+                    
+                    const cardKey = cardWrapper.dataset.card;
+                    const details = cardDetails[cardKey];
+                    if (details) {
+                        // Set content for the expanded card
+                        expandedTitleFront.textContent = details.title;
+                        expandedSubtitleFront.textContent = details.subtitle;
+                        expandedTitleBack.textContent = details.title;
+                        expandedDescriptionBack.textContent = details.description;
+                        
+                        // Show the expanded view and overlay
+                        expandedCardView.classList.remove('hidden');
+                        overlay.classList.add('visible');
+                        document.body.style.overflow = 'hidden';
+
+                        // Check if the small card was flipped and apply the flip to the expanded one
+                        if (card.classList.contains('flipped')) {
+                            expandedCardContent.classList.add('flipped');
+                        } else {
+                            expandedCardContent.classList.remove('flipped');
+                        }
+
+                        // Disable scroll listener while expanded
+                        window.removeEventListener('wheel', handleScroll);
+                    }
+                });
+            });
+
+            // Flip the expanded card on click
+            expandedCardContent.addEventListener('click', () => {
+                expandedCardContent.classList.toggle('flipped');
+            });
+
+            // Close button logic
+            closeButton.addEventListener('click', () => {
+                expandedCardView.classList.add('hidden');
+                overlay.classList.remove('visible');
+                document.body.style.overflow = 'auto'; // Re-enable body scroll
+                
+                // Re-enable the scroll listener when back on the grid
+                window.addEventListener('wheel', handleScroll);
+            });
+
+            // Click outside the card to close
+            overlay.addEventListener('click', () => {
+                closeButton.click();
+            });
+        });
+    </script>
+</body>
+</html>
